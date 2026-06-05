@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Compiladores</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <span class="brand-icon">&lt;/&gt;</span> Compiladores
+            </a>
+            <div class="nav-links">
+                <a asp-controller="Home" asp-action="Index">Inicio</a>
+                <div class="phases-menu">
+                    <span class="phases-toggle">Fases ▾</span>
+                    <div class="phases-dropdown">
+                        <a asp-controller="Fase1" asp-action="Index">Fase 1 · Análisis Léxico</a>
+                        <a asp-controller="Fase2" asp-action="Index">Fase 2 · Análisis Sintáctico</a>
+                        <a asp-controller="Fase3" asp-action="Index">Fase 3 · Análisis Semántico</a>
+                        <a asp-controller="Fase4" asp-action="Index">Fase 4 · Generación de Código Intermedio</a>
+                        <a asp-controller="Fase5" asp-action="Index">Fase 5 · Optimización de Código</a>
+                        <a asp-controller="Fase6" asp-action="Index">Fase 6 · Generación de Código Final</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <span class="footer-code">// Teoría de Compiladores — .NET 8 MVC</span>
+            <span>&copy; 2026</span>
+        </div>
+    </footer>
+
+    <script>
+        const toggle = document.querySelector('.phases-toggle');
+        const dropdown = document.querySelector('.phases-dropdown');
+        if (toggle && dropdown) {
+            toggle.addEventListener('click', () => dropdown.classList.toggle('open'));
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.phases-menu')) dropdown.classList.remove('open');
+            });
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

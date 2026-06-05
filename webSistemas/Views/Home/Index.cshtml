@@ -1,0 +1,252 @@
+@{
+    ViewData["Title"] = "Compiladores";
+}
+
+<style>
+    .hero {
+        padding: 2rem 1.5rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        font-size: 12px;
+        color: #6b7280;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 4px 10px;
+        margin-bottom: 0.75rem;
+        font-family: monospace;
+    }
+
+    .hero h1 {
+        font-size: 26px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+        font-size: 14px;
+        color: #6b7280;
+        line-height: 1.6;
+        max-width: 560px;
+    }
+
+    .pipeline {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+
+    .pip-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 13px;
+        color: #374151;
+        white-space: nowrap;
+    }
+
+    .pip-num {
+        font-family: monospace;
+        font-size: 11px;
+        color: #9ca3af;
+    }
+
+    .pip-arrow {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    .cards-section {
+        padding: 1.5rem;
+    }
+
+    .section-label {
+        font-size: 12px;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+    }
+
+    .phase-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        text-decoration: none;
+        display: block;
+        transition: border-color 0.15s;
+        border-left: 3px solid;
+    }
+
+        .phase-card:hover {
+            border-color: #9ca3af;
+            border-left-color: inherit;
+        }
+
+    .card-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-num {
+        font-size: 11px;
+        font-family: monospace;
+        color: #9ca3af;
+    }
+
+    .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .card-desc {
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.55;
+        margin-bottom: 0.75rem;
+    }
+
+    .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .tag {
+        font-size: 11px;
+        font-family: monospace;
+        color: #6b7280;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 2px 7px;
+    }
+</style>
+
+<div class="hero">
+    <div class="hero-badge">// Teoría de Compiladores</div>
+    <h1>Las 6 fases de un compilador</h1>
+    <p>Explora cada etapa del proceso de compilación: desde el análisis del código fuente hasta la generación del código ejecutable final.</p>
+</div>
+
+<div class="pipeline">
+    <div class="pip-item"><span class="pip-num">01</span> Análisis léxico</div>
+    <span class="pip-arrow">→</span>
+    <div class="pip-item"><span class="pip-num">02</span> Análisis sintáctico</div>
+    <span class="pip-arrow">→</span>
+    <div class="pip-item"><span class="pip-num">03</span> Análisis semántico</div>
+    <span class="pip-arrow">→</span>
+    <div class="pip-item"><span class="pip-num">04</span> Cód. intermedio</div>
+    <span class="pip-arrow">→</span>
+    <div class="pip-item"><span class="pip-num">05</span> Optimización</div>
+    <span class="pip-arrow">→</span>
+    <div class="pip-item"><span class="pip-num">06</span> Cód. final</div>
+</div>
+
+<section class="cards-section">
+    <div class="section-label">Fases del compilador</div>
+    <div class="cards-grid">
+
+        <a href="/Fase1" class="phase-card" style="border-left-color: #378ADD;">
+            <div class="card-top">
+                <span class="card-num">FASE 01</span>
+                <span class="card-title">Análisis Léxico</span>
+            </div>
+            <p class="card-desc">Convierte el código fuente en tokens. Identifica palabras clave, identificadores, operadores y literales.</p>
+            <div class="card-tags">
+                <span class="tag">tokens</span>
+                <span class="tag">lexer</span>
+                <span class="tag">scanner</span>
+            </div>
+        </a>
+
+        <a href="/Fase2" class="phase-card" style="border-left-color: #7F77DD;">
+            <div class="card-top">
+                <span class="card-num">FASE 02</span>
+                <span class="card-title">Análisis Sintáctico</span>
+            </div>
+            <p class="card-desc">Verifica que la estructura del programa siga las reglas gramaticales y construye el árbol sintáctico.</p>
+            <div class="card-tags">
+                <span class="tag">parser</span>
+                <span class="tag">AST</span>
+                <span class="tag">gramática</span>
+            </div>
+        </a>
+
+        <a href="/Fase3" class="phase-card" style="border-left-color: #1D9E75;">
+            <div class="card-top">
+                <span class="card-num">FASE 03</span>
+                <span class="card-title">Análisis Semántico</span>
+            </div>
+            <p class="card-desc">Verifica el significado del programa: tipos de datos, declaraciones y compatibilidad de operaciones.</p>
+            <div class="card-tags">
+                <span class="tag">tipos</span>
+                <span class="tag">tabla de símbolos</span>
+                <span class="tag">semántica</span>
+            </div>
+        </a>
+
+        <a href="/Fase4" class="phase-card" style="border-left-color: #EF9F27;">
+            <div class="card-top">
+                <span class="card-num">FASE 04</span>
+                <span class="card-title">Generación de Código Intermedio</span>
+            </div>
+            <p class="card-desc">Produce una representación independiente de la máquina: código de tres direcciones, cuádruplas o bytecode.</p>
+            <div class="card-tags">
+                <span class="tag">IR</span>
+                <span class="tag">3-address</span>
+                <span class="tag">bytecode</span>
+            </div>
+        </a>
+
+        <a href="/Fase5" class="phase-card" style="border-left-color: #E24B4A;">
+            <div class="card-top">
+                <span class="card-num">FASE 05</span>
+                <span class="card-title">Optimización de Código</span>
+            </div>
+            <p class="card-desc">Mejora el código intermedio: elimina código muerto, propagación de constantes y más.</p>
+            <div class="card-tags">
+                <span class="tag">inlining</span>
+                <span class="tag">DCE</span>
+                <span class="tag">CFG</span>
+            </div>
+        </a>
+
+        <a href="/Fase6" class="phase-card" style="border-left-color: #5DCAA5;">
+            <div class="card-top">
+                <span class="card-num">FASE 06</span>
+                <span class="card-title">Generación de Código Final</span>
+            </div>
+            <p class="card-desc">Traduce el código optimizado a lenguaje máquina o ensamblador para la arquitectura destino.</p>
+            <div class="card-tags">
+                <span class="tag">assembly</span>
+                <span class="tag">registros</span>
+                <span class="tag">código máquina</span>
+            </div>
+        </a>
+
+    </div>
+</section>

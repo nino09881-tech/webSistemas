@@ -1,0 +1,185 @@
+@{
+    ViewData["Title"] = "Fase 4 - Generación de Código Intermedio";
+}
+
+<div class="phase-header">
+    <div class="phase-header-meta">FASE 04 / 06 &nbsp;·&nbsp; Generación de Código Intermedio</div>
+    <h1>Generación de Código Intermedio</h1>
+    <p>Cuarta fase: traduce el AST decorado a una representación independiente de la máquina que facilita la optimización y la portabilidad.</p>
+</div>
+
+<div class="phase-content">
+
+    <!-- TEORÍA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">📖</span>
+            <h2>Teoría</h2>
+            <span class="block-tag">Fundamentos</span>
+        </div>
+        <div class="info-block-body">
+            <p>La <strong>generación de código intermedio</strong> produce una representación del programa que es independiente de la arquitectura destino. Esta representación actúa como puente entre el front-end (análisis) y el back-end (generación de código final) del compilador.</p>
+            <p>Las representaciones intermedias más comunes son:</p>
+            <ul>
+                <li><strong>Código de tres direcciones (3AC):</strong> instrucciones de la forma <code>x = y op z</code>. Cada instrucción tiene a lo más tres operandos. Es la forma más popular.</li>
+                <li><strong>Cuádruplas:</strong> tabla con campos (operador, arg1, arg2, resultado).</li>
+                <li><strong>Triples:</strong> similar a cuádruplas pero sin campo de resultado explícito.</li>
+                <li><strong>Forma SSA (Static Single Assignment):</strong> cada variable se asigna exactamente una vez. Usada por compiladores modernos como GCC y LLVM.</li>
+                <li><strong>Bytecode:</strong> instrucciones para una máquina virtual (JVM de Java, IL de .NET).</li>
+                <li><strong>Grafo de flujo de control (CFG):</strong> representación gráfica del flujo del programa.</li>
+            </ul>
+            <p>Las variables temporales generadas se denominan <code>t1, t2, t3...</code> y son almacenadas en la tabla de símbolos. Las instrucciones de salto usan etiquetas (<code>L1:</code>, <code>L2:</code>).</p>
+        </div>
+    </div>
+
+    <!-- IMAGEN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🖼️</span>
+            <h2>Cuádruplas vs Triples vs 3AC</h2>
+            <span class="block-tag">Visual</span>
+        </div>
+        <div class="info-block-body">
+            <div class="diagram-wrap">
+                <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;font-family:'JetBrains Mono',monospace;font-size:10px;">
+                    <!-- Source -->
+                    <text x="340" y="20" text-anchor="middle" fill="#64748b">Expresión fuente: a = b * c + d</text>
+                    <!-- 3AC Box -->
+                    <rect x="10" y="35" width="200" height="160" rx="6" fill="#111827" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="110" y="57" text-anchor="middle" fill="#f59e0b" font-weight="700">Código 3 Direcciones</text>
+                    <text x="25" y="80" fill="#ff79c6">t1</text><text x="45" y="80" fill="#64748b"> = </text><text x="62" y="80" fill="#f1fa8c">b * c</text>
+                    <text x="25" y="100" fill="#ff79c6">t2</text><text x="45" y="100" fill="#64748b"> = </text><text x="62" y="100" fill="#f1fa8c">t1 + d</text>
+                    <text x="25" y="120" fill="#ff79c6">a</text><text x="37" y="120" fill="#64748b">  = </text><text x="62" y="120" fill="#f1fa8c">t2</text>
+                    <!-- Cuadruplas Box -->
+                    <rect x="240" y="35" width="200" height="160" rx="6" fill="#111827" stroke="#00d4ff" stroke-width="1.5"/>
+                    <text x="340" y="57" text-anchor="middle" fill="#00d4ff" font-weight="700">Cuádruplas</text>
+                    <text x="255" y="75" fill="#64748b">Op   Arg1  Arg2  Res</text>
+                    <line x1="255" y1="80" x2="430" y2="80" stroke="#1e2d47"/>
+                    <text x="255" y="98" fill="#a5d6ff"> *    b     c    t1</text>
+                    <text x="255" y="115" fill="#a5d6ff"> +    t1    d    t2</text>
+                    <text x="255" y="132" fill="#a5d6ff"> =    t2    —    a</text>
+                    <!-- Triples Box -->
+                    <rect x="470" y="35" width="200" height="160" rx="6" fill="#111827" stroke="#7c3aed" stroke-width="1.5"/>
+                    <text x="570" y="57" text-anchor="middle" fill="#a78bfa" font-weight="700">Triples</text>
+                    <text x="485" y="75" fill="#64748b">N°  Op   Arg1   Arg2</text>
+                    <line x1="485" y1="80" x2="660" y2="80" stroke="#1e2d47"/>
+                    <text x="485" y="98" fill="#a5d6ff">(0)  *    b      c</text>
+                    <text x="485" y="115" fill="#a5d6ff">(1)  +   (0)     d</text>
+                    <text x="485" y="132" fill="#a5d6ff">(2)  =    a     (1)</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- EJEMPLO -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">💡</span>
+            <h2>Ejemplo Práctico</h2>
+            <span class="block-tag">Código</span>
+        </div>
+        <div class="info-block-body">
+            <p><strong>Código fuente (C-like):</strong></p>
+            <div class="code-block"><span class="kw">if</span> (a &lt; b) {
+    x = a * 2 + 1;
+} <span class="kw">else</span> {
+    x = b;
+}</div>
+            <p><strong>Código de tres direcciones generado:</strong></p>
+            <div class="code-block"><span class="cm">// Evaluación de la condición</span>
+t1 = a &lt; b
+<span class="kw">if</span> t1 <span class="kw">goto</span> L1
+<span class="kw">goto</span> L2
+
+<span class="cm">// Rama if (true)</span>
+L1:
+  t2 = a * <span class="num">2</span>
+  t3 = t2 + <span class="num">1</span>
+  x  = t3
+  <span class="kw">goto</span> L3
+
+<span class="cm">// Rama else</span>
+L2:
+  x = b
+
+<span class="cm">// Fin del if</span>
+L3:</div>
+        </div>
+    </div>
+
+    <!-- ERRORES -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">⚠️</span>
+            <h2>Problemas en esta Fase</h2>
+            <span class="block-tag">Errores</span>
+        </div>
+        <div class="info-block-body">
+            <table class="error-table">
+                <tr><th>Problema</th><th>Descripción</th><th>Impacto</th></tr>
+                <tr>
+                    <td><span class="badge-error">desbordamiento de temporales</span></td>
+                    <td>Generación excesiva de variables temporales</td>
+                    <td>Presión sobre registros y memoria</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">saltos incorrectos</span></td>
+                    <td>Etiquetas de salto mal calculadas en bucles anidados</td>
+                    <td>Comportamiento erróneo del programa</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">pérdida de información de tipo</span></td>
+                    <td>No preservar el tipo para la generación de código final</td>
+                    <td>Código máquina incorrecto para flotantes/enteros</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">acceso a arrays sin bounds</span></td>
+                    <td>No generar verificación de límites de arreglos</td>
+                    <td>Vulnerabilidades de seguridad</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- IMPORTANCIA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🎯</span>
+            <h2>Importancia</h2>
+            <span class="block-tag">Relevancia</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>El código intermedio es el elemento que hace posible la <strong>portabilidad de los compiladores</strong>. Un mismo front-end puede conectarse a múltiples back-ends para distintas arquitecturas (x86, ARM, RISC-V) simplemente cambiando la última etapa.</p>
+            </div>
+            <ul>
+                <li>Separa claramente el análisis del lenguaje de la arquitectura hardware.</li>
+                <li>Permite aplicar optimizaciones independientes de la máquina (fase 5).</li>
+                <li>Es la base de compiladores multi-plataforma como LLVM y GCC.</li>
+                <li>Facilita la compilación Just-In-Time (JIT) de Java y .NET.</li>
+                <li>Simplifica la implementación de compiladores cruzados (<em>cross-compilers</em>).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- CONCLUSIÓN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">✅</span>
+            <h2>Conclusión</h2>
+            <span class="block-tag">Resumen</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>La generación de código intermedio es la transición del mundo abstracto del análisis al mundo concreto de la ejecución. La representación IR captura la semántica completa del programa en una forma simplificada y regular que puede procesarse de forma sistemática.</p>
+                <p>Es en esta fase donde el compilador se vuelve verdaderamente independiente de la plataforma, permitiendo la visión de <em>"compila una vez, ejecuta en cualquier lugar"</em>.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="phase-footer-nav">
+    <a href="/Fase3" class="nav-link-btn">← Fase 3: Análisis Semántico</a>
+    <a href="/Fase5" class="nav-link-btn">Fase 5: Optimización →</a>
+</div>

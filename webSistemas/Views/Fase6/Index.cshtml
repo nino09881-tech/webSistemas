@@ -1,0 +1,200 @@
+@{
+    ViewData["Title"] = "Fase 6 - Generación de Código Final";
+}
+
+<div class="phase-header">
+    <div class="phase-header-meta">FASE 06 / 06 &nbsp;·&nbsp; Generación de Código Final</div>
+    <h1>Generación de Código Final</h1>
+    <p>Última fase: traduce el código intermedio optimizado a instrucciones de lenguaje máquina o ensamblador específicas para la arquitectura destino.</p>
+</div>
+
+<div class="phase-content">
+
+    <!-- TEORÍA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">📖</span>
+            <h2>Teoría</h2>
+            <span class="block-tag">Fundamentos</span>
+        </div>
+        <div class="info-block-body">
+            <p>La <strong>generación de código final</strong> es la fase que produce el programa ejecutable. Toma el código intermedio optimizado y lo mapea a instrucciones concretas de la arquitectura destino (x86-64, ARM64, RISC-V, etc.).</p>
+            <p>Sus tareas principales son:</p>
+            <ul>
+                <li><strong>Selección de instrucciones:</strong> elegir las instrucciones de la ISA que mejor implementan cada operación del IR. Utiliza técnicas de <em>tiling</em> del árbol de instrucciones.</li>
+                <li><strong>Asignación de registros:</strong> decidir qué variables y temporales van en registros del procesador y cuáles deben ir a memoria (<em>spilling</em>). Es un problema NP-completo resuelto con heurísticas de coloración de grafos.</li>
+                <li><strong>Planificación de instrucciones (scheduling):</strong> reordena instrucciones para evitar dependencias y aprovechar el pipeline del procesador.</li>
+                <li><strong>Gestión del stack frame:</strong> organiza el marco de activación de cada función (parámetros, variables locales, dirección de retorno).</li>
+                <li><strong>Resolución de etiquetas y relocalización:</strong> calcula direcciones absolutas o relativas de saltos y datos.</li>
+            </ul>
+            <p>El resultado es código ensamblador (<code>.asm</code>) o directamente código objeto (<code>.o</code>) que un <strong>linker</strong> combinará con bibliotecas para producir el ejecutable final.</p>
+        </div>
+    </div>
+
+    <!-- IMAGEN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🖼️</span>
+            <h2>Asignación de Registros</h2>
+            <span class="block-tag">Visual</span>
+        </div>
+        <div class="info-block-body">
+            <div class="diagram-wrap">
+                <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;font-family:'JetBrains Mono',monospace;font-size:10px;">
+                    <!-- IR Code -->
+                    <rect x="10" y="15" width="200" height="175" rx="8" fill="#111827" stroke="#00d4ff" stroke-width="1.5"/>
+                    <text x="110" y="38" text-anchor="middle" fill="#00d4ff" font-weight="700">Código IR</text>
+                    <text x="25" y="60" fill="#a5d6ff">t1 = a + b</text>
+                    <text x="25" y="78" fill="#a5d6ff">t2 = t1 * c</text>
+                    <text x="25" y="96" fill="#a5d6ff">t3 = t2 - d</text>
+                    <text x="25" y="114" fill="#a5d6ff">return t3</text>
+                    <!-- Arrow + label -->
+                    <line x1="210" y1="100" x2="255" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arw2)"/>
+                    <text x="232" y="93" text-anchor="middle" fill="#64748b" font-size="8">asigna</text>
+                    <text x="232" y="107" text-anchor="middle" fill="#64748b" font-size="8">registros</text>
+                    <!-- Register map -->
+                    <rect x="256" y="15" width="180" height="175" rx="8" fill="#0d1117" stroke="#1e2d47"/>
+                    <text x="346" y="38" text-anchor="middle" fill="#64748b" font-weight="700">Mapa</text>
+                    <text x="275" y="60" fill="#ff79c6">t1</text><text x="295" y="60" fill="#64748b"> → </text><text x="320" y="60" fill="#50fa7b">rax</text>
+                    <text x="275" y="78" fill="#ff79c6">t2</text><text x="295" y="78" fill="#64748b"> → </text><text x="320" y="78" fill="#50fa7b">rbx</text>
+                    <text x="275" y="96" fill="#ff79c6">t3</text><text x="295" y="96" fill="#64748b"> → </text><text x="320" y="96" fill="#50fa7b">rcx</text>
+                    <text x="275" y="114" fill="#ff79c6">a </text><text x="295" y="114" fill="#64748b"> → </text><text x="320" y="114" fill="#50fa7b">rdi</text>
+                    <text x="275" y="132" fill="#ff79c6">b </text><text x="295" y="132" fill="#64748b"> → </text><text x="320" y="132" fill="#50fa7b">rsi</text>
+                    <text x="275" y="150" fill="#ff79c6">c </text><text x="295" y="150" fill="#64748b"> → </text><text x="320" y="150" fill="#50fa7b">rdx</text>
+                    <text x="275" y="168" fill="#ff79c6">d </text><text x="295" y="168" fill="#64748b"> → </text><text x="320" y="168" fill="#bd93f9">[rbp-8] (spill)</text>
+                    <!-- Arrow -->
+                    <line x1="436" y1="100" x2="470" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arw2)"/>
+                    <!-- Assembly -->
+                    <rect x="471" y="15" width="200" height="175" rx="8" fill="#111827" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="571" y="38" text-anchor="middle" fill="#10b981" font-weight="700">x86-64 Assembly</text>
+                    <text x="486" y="60" fill="#50fa7b">mov  rax, rdi</text>
+                    <text x="486" y="78" fill="#50fa7b">add  rax, rsi</text>
+                    <text x="486" y="96" fill="#50fa7b">imul rbx, rax, rdx</text>
+                    <text x="486" y="114" fill="#50fa7b">mov  rcx, rbx</text>
+                    <text x="486" y="132" fill="#50fa7b">sub  rcx, [rbp-8]</text>
+                    <text x="486" y="150" fill="#50fa7b">mov  rax, rcx</text>
+                    <text x="486" y="168" fill="#50fa7b">ret</text>
+                    <defs>
+                        <marker id="arw2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                            <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- EJEMPLO -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">💡</span>
+            <h2>Ejemplo Práctico</h2>
+            <span class="block-tag">Código</span>
+        </div>
+        <div class="info-block-body">
+            <p><strong>Código C de alto nivel:</strong></p>
+            <div class="code-block"><span class="kw">int</span> <span class="fn">suma</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+    <span class="kw">return</span> a + b;
+}</div>
+            <p><strong>Ensamblador x86-64 generado (ABI Linux):</strong></p>
+            <div class="code-block"><span class="cm">; suma(int a, int b) → a en edi, b en esi</span>
+<span class="fn">suma</span>:
+    push  rbp
+    mov   rbp, rsp       <span class="cm">; prologue: configura stack frame</span>
+
+    mov   eax, edi       <span class="cm">; eax = a (primer argumento)</span>
+    add   eax, esi       <span class="cm">; eax = a + b</span>
+                         <span class="cm">; retorno en eax por convención</span>
+    pop   rbp
+    ret                  <span class="cm">; retorna con eax = a+b</span></div>
+            <p><strong>ARM64 equivalente:</strong></p>
+            <div class="code-block"><span class="fn">suma</span>:
+    add   w0, w0, w1    <span class="cm">; w0 = w0 + w1 (args en w0, w1)</span>
+    ret                  <span class="cm">; retorno en w0</span></div>
+            <p>Nótese cómo la misma función genera instrucciones distintas según la arquitectura, pero ambas son semánticamente equivalentes.</p>
+        </div>
+    </div>
+
+    <!-- ERRORES -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">⚠️</span>
+            <h2>Problemas en Generación de Código</h2>
+            <span class="block-tag">Errores</span>
+        </div>
+        <div class="info-block-body">
+            <table class="error-table">
+                <tr><th>Problema</th><th>Descripción</th><th>Efecto</th></tr>
+                <tr>
+                    <td><span class="badge-error">spilling excesivo</span></td>
+                    <td>Demasiadas variables enviadas a memoria por falta de registros</td>
+                    <td>Código lento por accesos a RAM frecuentes</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">violación de ABI</span></td>
+                    <td>No respetar la convención de llamada del sistema operativo</td>
+                    <td>Crashes al llamar funciones externas o del SO</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">alineamiento incorrecto</span></td>
+                    <td>Datos no alineados a la frontera correcta de memoria</td>
+                    <td>Fallo de segmentación en arquitecturas estrictas (ARM)</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">pipeline stalls</span></td>
+                    <td>Instrucciones dependientes consecutivas sin reordenar</td>
+                    <td>CPU forzada a esperar (burbujas en el pipeline)</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">dirección de salto errónea</span></td>
+                    <td>Cálculo incorrecto de offset en saltos relativos</td>
+                    <td>Ejecución de código arbitrario (bug crítico)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- IMPORTANCIA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🎯</span>
+            <h2>Importancia</h2>
+            <span class="block-tag">Relevancia</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>La generación de código final es el <strong>resultado tangible</strong> de todo el proceso de compilación. Es donde el trabajo abstracto de análisis y optimización se convierte en instrucciones que el hardware puede ejecutar directamente.</p>
+            </div>
+            <ul>
+                <li>Determina el rendimiento final del ejecutable en la plataforma objetivo.</li>
+                <li>La calidad de la asignación de registros tiene el mayor impacto en el rendimiento.</li>
+                <li>Debe respetar la ABI del sistema para interoperar con el SO y bibliotecas.</li>
+                <li>El scheduling de instrucciones puede reducir latencias de pipeline en un 20-30%.</li>
+                <li>Es el punto donde el compilador aprovecha instrucciones especiales (SIMD, FMA, SVE).</li>
+                <li>Código compacto mejora la eficiencia de la caché de instrucciones (I-cache).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- CONCLUSIÓN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">✅</span>
+            <h2>Conclusión</h2>
+            <span class="block-tag">Resumen</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>La generación de código final cierra el ciclo del compilador. Todo el trabajo previo de análisis, verificación y optimización culmina aquí en código máquina ejecutable y eficiente.</p>
+                <p>Es la fase más dependiente de la arquitectura y requiere un profundo conocimiento del hardware objetivo: su conjunto de instrucciones (ISA), su jerarquía de memoria, los registros disponibles y las convenciones del sistema operativo.</p>
+                <p>Un buen generador de código convierte un buen algoritmo en un programa veloz. Un mal generador puede arruinar incluso el mejor código fuente. Por eso los compiladores de producción como GCC, Clang/LLVM y MSVC invierten enormes recursos en esta fase.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="phase-footer-nav">
+    <a href="/Fase5" class="nav-link-btn">← Fase 5: Optimización</a>
+    <a href="/" class="nav-link-btn">🏠 Volver al Inicio</a>
+</div>

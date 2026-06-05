@@ -1,0 +1,195 @@
+@{
+    ViewData["Title"] = "Fase 3 - Análisis Semántico";
+}
+
+<div class="phase-header">
+    <div class="phase-header-meta">FASE 03 / 06 &nbsp;·&nbsp; Análisis Semántico</div>
+    <h1>Análisis Semántico</h1>
+    <p>Tercera fase: verifica el significado del programa. Comprueba tipos, declaraciones de variables y la coherencia lógica de las operaciones.</p>
+</div>
+
+<div class="phase-content">
+
+    <!-- TEORÍA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">📖</span>
+            <h2>Teoría</h2>
+            <span class="block-tag">Fundamentos</span>
+        </div>
+        <div class="info-block-body">
+            <p>El <strong>análisis semántico</strong> opera sobre el AST producido por el parser para verificar que el programa sea <em>semánticamente correcto</em>, es decir, que tenga sentido lógico más allá de su estructura gramatical.</p>
+            <p>Sus tareas principales son:</p>
+            <ul>
+                <li><strong>Verificación de tipos (type checking):</strong> asegura que las operaciones se apliquen sobre tipos compatibles (<code>int + int</code> es válido; <code>int + string</code> puede no serlo según el lenguaje).</li>
+                <li><strong>Declaración de variables:</strong> verifica que cada variable esté declarada antes de usarse y que no se dupliquen en el mismo ámbito.</li>
+                <li><strong>Resolución de ámbito (scope resolution):</strong> determina a qué declaración corresponde cada uso de un identificador.</li>
+                <li><strong>Tabla de símbolos:</strong> estructura de datos que almacena información sobre cada identificador del programa (tipo, ámbito, valor si es constante).</li>
+                <li><strong>Conversiones implícitas:</strong> gestiona coerciones de tipo automáticas cuando corresponde.</li>
+                <li><strong>Verificación de flujo:</strong> comprueba que las funciones tengan retorno, que el <code>break</code> esté dentro de un bucle, etc.</li>
+            </ul>
+            <p>Al finalizar esta fase, el AST es <strong>decorado</strong> con información de tipos y la tabla de símbolos está completa.</p>
+        </div>
+    </div>
+
+    <!-- IMAGEN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🖼️</span>
+            <h2>Tabla de Símbolos</h2>
+            <span class="block-tag">Visual</span>
+        </div>
+        <div class="info-block-body">
+            <div class="diagram-wrap">
+                <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;font-family:'JetBrains Mono',monospace;font-size:11px;">
+                    <!-- Table header -->
+                    <rect x="40" y="20" width="520" height="34" rx="4" fill="#1a2236" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="120" y="42" text-anchor="middle" fill="#10b981" font-weight="700">Nombre</text>
+                    <text x="240" y="42" text-anchor="middle" fill="#10b981" font-weight="700">Tipo</text>
+                    <text x="360" y="42" text-anchor="middle" fill="#10b981" font-weight="700">Ámbito</text>
+                    <text x="490" y="42" text-anchor="middle" fill="#10b981" font-weight="700">Dirección</text>
+                    <!-- Separators -->
+                    <line x1="185" y1="20" x2="185" y2="200" stroke="#1e2d47"/>
+                    <line x1="300" y1="20" x2="300" y2="200" stroke="#1e2d47"/>
+                    <line x1="415" y1="20" x2="415" y2="200" stroke="#1e2d47"/>
+                    <!-- Row 1 -->
+                    <rect x="40" y="54" width="520" height="36" fill="#111827"/>
+                    <text x="120" y="77" text-anchor="middle" fill="#f1fa8c">x</text>
+                    <text x="240" y="77" text-anchor="middle" fill="#a5d6ff">int</text>
+                    <text x="360" y="77" text-anchor="middle" fill="#64748b">global</text>
+                    <text x="490" y="77" text-anchor="middle" fill="#bd93f9">0x0010</text>
+                    <!-- Row 2 -->
+                    <rect x="40" y="90" width="520" height="36" fill="#0d1117"/>
+                    <text x="120" y="113" text-anchor="middle" fill="#f1fa8c">resultado</text>
+                    <text x="240" y="113" text-anchor="middle" fill="#a5d6ff">float</text>
+                    <text x="360" y="113" text-anchor="middle" fill="#64748b">local:main</text>
+                    <text x="490" y="113" text-anchor="middle" fill="#bd93f9">0x0018</text>
+                    <!-- Row 3 -->
+                    <rect x="40" y="126" width="520" height="36" fill="#111827"/>
+                    <text x="120" y="149" text-anchor="middle" fill="#f1fa8c">calcular</text>
+                    <text x="240" y="149" text-anchor="middle" fill="#a5d6ff">fn(int)→float</text>
+                    <text x="360" y="149" text-anchor="middle" fill="#64748b">global</text>
+                    <text x="490" y="149" text-anchor="middle" fill="#bd93f9">0x0100</text>
+                    <!-- Row 4 -->
+                    <rect x="40" y="162" width="520" height="38" fill="#0d1117"/>
+                    <text x="120" y="186" text-anchor="middle" fill="#f1fa8c">MAX</text>
+                    <text x="240" y="186" text-anchor="middle" fill="#a5d6ff">const int</text>
+                    <text x="360" y="186" text-anchor="middle" fill="#64748b">global</text>
+                    <text x="490" y="186" text-anchor="middle" fill="#bd93f9">100</text>
+                    <!-- border -->
+                    <rect x="40" y="20" width="520" height="180" rx="4" fill="none" stroke="#1e2d47" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.75rem;">La tabla de símbolos registra cada identificador con su tipo, ámbito y dirección de memoria asignada.</p>
+        </div>
+    </div>
+
+    <!-- EJEMPLO -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">💡</span>
+            <h2>Ejemplo Práctico</h2>
+            <span class="block-tag">Código</span>
+        </div>
+        <div class="info-block-body">
+            <p><strong>Código fuente:</strong></p>
+            <div class="code-block"><span class="kw">int</span> x = <span class="num">5</span>;
+<span class="kw">float</span> y = x * <span class="num">2.5</span>;   <span class="cm">// Conversión implícita int → float ✓</span>
+<span class="kw">string</span> s = x + y;    <span class="cm">// ERROR: no se puede sumar int+float a string</span></div>
+            <p><strong>Verificación de tipos que realiza el analizador semántico:</strong></p>
+            <div class="code-block"><span class="cm">// Línea 1: int x = 5;</span>
+<span class="fn">declara</span>(x, <span class="kw">int</span>)   → OK
+<span class="fn">asigna</span>(<span class="num">5</span>, <span class="kw">int</span>)    → OK, tipos compatibles
+
+<span class="cm">// Línea 2: float y = x * 2.5;</span>
+<span class="fn">op</span>(<span class="kw">int</span> * <span class="kw">float</span>)   → coerción: int → float ✓
+resultado: <span class="kw">float</span>
+<span class="fn">asigna</span>(<span class="kw">float</span> → <span class="kw">float</span>) → OK
+
+<span class="cm">// Línea 3: string s = x + y;</span>
+<span class="fn">op</span>(<span class="kw">int</span> + <span class="kw">float</span>)   → resultado: <span class="kw">float</span>
+<span class="fn">asigna</span>(<span class="kw">float</span> → <span class="kw">string</span>) → <span class="badge-error">ERROR de tipos</span></div>
+        </div>
+    </div>
+
+    <!-- ERRORES -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">⚠️</span>
+            <h2>Errores Semánticos Comunes</h2>
+            <span class="block-tag">Errores</span>
+        </div>
+        <div class="info-block-body">
+            <table class="error-table">
+                <tr><th>Error</th><th>Descripción</th><th>Ejemplo</th></tr>
+                <tr>
+                    <td><span class="badge-error">variable no declarada</span></td>
+                    <td>Uso de un identificador sin declararlo previamente</td>
+                    <td><code>y = x + 1;</code> sin declarar <code>y</code></td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">incompatibilidad de tipos</span></td>
+                    <td>Operación entre tipos incompatibles</td>
+                    <td><code>int x = "texto";</code></td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">doble declaración</span></td>
+                    <td>Declarar la misma variable dos veces en el mismo ámbito</td>
+                    <td><code>int x; int x;</code></td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">aridad incorrecta</span></td>
+                    <td>Llamada a función con número equivocado de argumentos</td>
+                    <td><code>void f(int a){} f(1,2);</code></td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">retorno ausente</span></td>
+                    <td>Función no-void sin sentencia return</td>
+                    <td><code>int suma(int a){int b = a+1;}</code></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- IMPORTANCIA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🎯</span>
+            <h2>Importancia</h2>
+            <span class="block-tag">Relevancia</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>Sin análisis semántico, un compilador podría generar código para programas que son gramaticalmente válidos pero lógicamente incorrectos, produciendo resultados impredecibles en tiempo de ejecución.</p>
+            </div>
+            <ul>
+                <li>Garantiza la <strong>seguridad de tipos</strong>, fundamental en lenguajes como C#, Java o Rust.</li>
+                <li>La tabla de símbolos es esencial para la generación de código y la gestión de memoria.</li>
+                <li>Detecta clases enteras de bugs antes de ejecutar el programa.</li>
+                <li>Permite optimizaciones basadas en tipos (saber que una variable es <code>const</code> o su tipo exacto).</li>
+                <li>Es la base del <em>type inference</em> en lenguajes como Kotlin, TypeScript o Haskell.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- CONCLUSIÓN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">✅</span>
+            <h2>Conclusión</h2>
+            <span class="block-tag">Resumen</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>El análisis semántico es la fase que dota de <em>significado</em> al programa. Un programa puede ser léxicamente y sintácticamente correcto pero semánticamente absurdo. Esta fase previene ese escenario mediante un sistema de tipos riguroso y la verificación de reglas contextuales.</p>
+                <p>Al completarse, el compilador tiene plena confianza en que el programa es correcto y puede proceder a generar código intermedio de forma segura.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="phase-footer-nav">
+    <a href="/Fase2" class="nav-link-btn">← Fase 2: Análisis Sintáctico</a>
+    <a href="/Fase4" class="nav-link-btn">Fase 4: Código Intermedio →</a>
+</div>

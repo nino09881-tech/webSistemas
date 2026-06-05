@@ -1,0 +1,179 @@
+@{
+    ViewData["Title"] = "Fase 5 - Optimización de Código";
+}
+
+<div class="phase-header">
+    <div class="phase-header-meta">FASE 05 / 06 &nbsp;·&nbsp; Optimización de Código</div>
+    <h1>Optimización de Código</h1>
+    <p>Quinta fase: mejora el código intermedio para producir programas más rápidos y eficientes sin alterar el resultado de la computación.</p>
+</div>
+
+<div class="phase-content">
+
+    <!-- TEORÍA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">📖</span>
+            <h2>Teoría</h2>
+            <span class="block-tag">Fundamentos</span>
+        </div>
+        <div class="info-block-body">
+            <p>La <strong>optimización de código</strong> transforma el código intermedio para que el programa resultante sea más eficiente en tiempo de ejecución y uso de memoria, preservando siempre el comportamiento semántico original.</p>
+            <p>Las optimizaciones se clasifican por su alcance:</p>
+            <ul>
+                <li><strong>Locales:</strong> dentro de un bloque básico (secuencia lineal sin saltos).</li>
+                <li><strong>Globales:</strong> a través de todo el grafo de flujo de control (CFG).</li>
+                <li><strong>Inter-procedurales:</strong> entre distintas funciones del programa.</li>
+                <li><strong>De bucle:</strong> optimizaciones específicas para ciclos (los más costosos).</li>
+            </ul>
+            <p>Técnicas fundamentales:</p>
+            <ul>
+                <li><strong>Eliminación de código muerto (DCE):</strong> elimina instrucciones cuyos resultados nunca se usan.</li>
+                <li><strong>Propagación de constantes:</strong> sustituye variables con valor constante conocido.</li>
+                <li><strong>Reducción de potencia:</strong> reemplaza operaciones costosas por equivalentes baratas (<code>x*2</code> → <code>x+x</code>).</li>
+                <li><strong>Eliminación de subexpresiones comunes (CSE):</strong> evita recalcular expresiones idénticas.</li>
+                <li><strong>Inlining de funciones:</strong> reemplaza llamadas por el cuerpo de la función.</li>
+                <li><strong>Movimiento de código invariante de bucle (LICM):</strong> saca cálculos constantes fuera del bucle.</li>
+                <li><strong>Loop unrolling:</strong> desdobla iteraciones del bucle para reducir el overhead del salto.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- IMAGEN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🖼️</span>
+            <h2>Antes y Después de Optimizar</h2>
+            <span class="block-tag">Visual</span>
+        </div>
+        <div class="info-block-body">
+            <div class="diagram-wrap">
+                <svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;font-family:'JetBrains Mono',monospace;font-size:10px;">
+                    <!-- Before -->
+                    <rect x="10" y="10" width="300" height="195" rx="8" fill="#111827" stroke="#ef4444" stroke-width="1.5"/>
+                    <text x="160" y="33" text-anchor="middle" fill="#ef4444" font-weight="700">SIN OPTIMIZAR</text>
+                    <text x="25" y="58" fill="#64748b">t1 = 2 * 2</text>
+                    <text x="25" y="76" fill="#64748b">t2 = x + t1</text>
+                    <text x="25" y="94" fill="#64748b">t3 = x + t1    // subexpr duplicada</text>
+                    <text x="25" y="112" fill="#64748b">y  = t2</text>
+                    <text x="25" y="130" fill="#64748b">z  = t3</text>
+                    <text x="25" y="148" fill="#64748b">w  = y * 0     // siempre 0</text>
+                    <text x="25" y="166" fill="#64748b">k  = w + 5     // w siempre 0</text>
+                    <text x="25" y="184" fill="#64748b">// 7 instrucciones</text>
+                    <!-- Arrow -->
+                    <text x="340" y="115" text-anchor="middle" fill="#10b981" font-size="16">→</text>
+                    <!-- After -->
+                    <rect x="370" y="10" width="300" height="195" rx="8" fill="#111827" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="520" y="33" text-anchor="middle" fill="#10b981" font-weight="700">OPTIMIZADO</text>
+                    <text x="385" y="58" fill="#a5d6ff">t1 = x + 4  // 2*2=4 constante</text>
+                    <text x="385" y="76" fill="#a5d6ff">y  = t1     // CSE: t2==t3</text>
+                    <text x="385" y="94" fill="#a5d6ff">z  = t1     // reutiliza t1</text>
+                    <text x="385" y="112" fill="#a5d6ff">k  = 5      // w*0=0, 0+5=5</text>
+                    <text x="385" y="145" fill="#64748b" font-style="italic">// 4 instrucciones (−43%)</text>
+                    <text x="385" y="163" fill="#64748b" font-style="italic">// Técnicas aplicadas:</text>
+                    <text x="385" y="181" fill="#64748b" font-style="italic">// CSE + Const. prop + DCE</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- EJEMPLO -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">💡</span>
+            <h2>Ejemplo Práctico: LICM</h2>
+            <span class="block-tag">Código</span>
+        </div>
+        <div class="info-block-body">
+            <p><strong>Movimiento de código invariante de bucle (Loop Invariant Code Motion):</strong></p>
+            <div class="code-block"><span class="cm">// ANTES — cálculo repetido N veces innecesariamente</span>
+<span class="kw">for</span> (i = <span class="num">0</span>; i &lt; n; i++) {
+    limite = max * factor;    <span class="cm">// max y factor no cambian</span>
+    arr[i] = arr[i] + limite;
+}
+
+<span class="cm">// DESPUÉS — cálculo movido fuera del bucle</span>
+limite = max * factor;       <span class="cm">// solo 1 vez</span>
+<span class="kw">for</span> (i = <span class="num">0</span>; i &lt; n; i++) {
+    arr[i] = arr[i] + limite;
+}</div>
+            <p>Si <code>n = 10,000</code>, la optimización elimina 9,999 multiplicaciones innecesarias.</p>
+        </div>
+    </div>
+
+    <!-- ERRORES -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">⚠️</span>
+            <h2>Riesgos de Optimización</h2>
+            <span class="block-tag">Errores</span>
+        </div>
+        <div class="info-block-body">
+            <table class="error-table">
+                <tr><th>Riesgo</th><th>Descripción</th><th>Consecuencia</th></tr>
+                <tr>
+                    <td><span class="badge-error">eliminación incorrecta</span></td>
+                    <td>Eliminar código que parece muerto pero tiene efectos laterales</td>
+                    <td>Comportamiento incorrecto del programa</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">reordenamiento inválido</span></td>
+                    <td>Mover operaciones que dependen de estado compartido (multithreading)</td>
+                    <td>Condiciones de carrera (<em>race conditions</em>)</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">pérdida de precisión</span></td>
+                    <td>Reordenar operaciones flotantes cambia resultados por redondeo</td>
+                    <td>Resultados numéricos distintos</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">over-inlining</span></td>
+                    <td>Incrustar funciones muy grandes aumenta el tamaño del código</td>
+                    <td>Peor rendimiento por fallos de caché I-cache</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- IMPORTANCIA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🎯</span>
+            <h2>Importancia</h2>
+            <span class="block-tag">Relevancia</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>La optimización es lo que diferencia a un compilador básico de uno de producción. Los compiladores modernos (GCC <code>-O3</code>, Clang, MSVC) pueden mejorar el rendimiento del código generado en <strong>2x a 10x</strong> con respecto al código sin optimizar.</p>
+            </div>
+            <ul>
+                <li>Permite escribir código legible y dejar al compilador la eficiencia.</li>
+                <li>Reduce el consumo de energía, crítico en dispositivos móviles e IoT.</li>
+                <li>Mejora el uso de cachés de CPU mediante localidad de datos.</li>
+                <li>Vectorización automática (SIMD) puede multiplicar el throughput por 4x–16x.</li>
+                <li>Aplicaciones en tiempo real dependen de estas optimizaciones para cumplir deadlines.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- CONCLUSIÓN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">✅</span>
+            <h2>Conclusión</h2>
+            <span class="block-tag">Resumen</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>La optimización de código es el arte de hacer más con menos. Cada técnica aplica un principio matemático o de arquitectura de computadoras para reducir el trabajo innecesario, aprovechando el conocimiento estático que tiene el compilador sobre el programa.</p>
+                <p>Es una fase opcional en teoría, pero en la práctica es indispensable para generar software competitivo. La clave es preservar siempre la semántica original mientras se maximiza el rendimiento.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="phase-footer-nav">
+    <a href="/Fase4" class="nav-link-btn">← Fase 4: Código Intermedio</a>
+    <a href="/Fase6" class="nav-link-btn">Fase 6: Código Final →</a>
+</div>

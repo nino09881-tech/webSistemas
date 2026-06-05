@@ -1,0 +1,13 @@
+@model Compiladores.Models.ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="page-hero" style="min-height:40vh;">
+    <h1 class="hero-title" style="color:#ff4757;">Error</h1>
+    <p class="hero-sub">Ocurrió un error inesperado.</p>
+    @if (Model.ShowRequestId)
+    {
+        <p><code>Request ID: @Model.RequestId</code></p>
+    }
+</div>

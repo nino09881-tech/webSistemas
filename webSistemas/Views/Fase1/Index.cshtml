@@ -1,0 +1,196 @@
+@{
+    ViewData["Title"] = "Fase 1 - Análisis Léxico";
+}
+
+<div class="phase-header">
+    <div class="phase-header-meta">FASE 01 / 06 &nbsp;·&nbsp; Análisis Léxico</div>
+    <h1>Análisis Léxico</h1>
+    <p>Primera fase del compilador: convierte el flujo de caracteres del código fuente en una secuencia de tokens significativos.</p>
+</div>
+
+<div class="phase-content">
+
+    <!-- TEORÍA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">📖</span>
+            <h2>Teoría</h2>
+            <span class="block-tag">Fundamentos</span>
+        </div>
+        <div class="info-block-body">
+            <p>El <strong>análisis léxico</strong> (también llamado <em>scanning</em> o <em>tokenización</em>) es la primera fase del proceso de compilación. Su función es leer el código fuente carácter a carácter y agruparlos en unidades significativas llamadas <strong>tokens</strong>.</p>
+            <p>Un token es un par <code>(tipo, valor)</code> que representa una unidad léxica atómica. Los tipos de tokens más comunes son:</p>
+            <ul>
+                <li><strong>Palabras clave:</strong> <code>if</code>, <code>while</code>, <code>for</code>, <code>int</code>, <code>return</code></li>
+                <li><strong>Identificadores:</strong> nombres de variables, funciones, clases</li>
+                <li><strong>Literales:</strong> números (<code>42</code>, <code>3.14</code>), cadenas (<code>"hola"</code>)</li>
+                <li><strong>Operadores:</strong> <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>==</code>, <code>&lt;=</code></li>
+                <li><strong>Delimitadores:</strong> <code>(</code>, <code>)</code>, <code>{</code>, <code>}</code>, <code>;</code></li>
+                <li><strong>Comentarios y espacios en blanco:</strong> generalmente ignorados</li>
+            </ul>
+            <p>El componente que realiza este análisis se llama <strong>lexer</strong> o <strong>scanner</strong>. Internamente utiliza <strong>expresiones regulares</strong> y <strong>autómatas finitos deterministas (AFD)</strong> para reconocer los patrones de cada tipo de token.</p>
+            <p>El lexer actúa como interfaz entre el código fuente textual y las fases subsiguientes del compilador, entregando la secuencia de tokens al analizador sintáctico.</p>
+        </div>
+    </div>
+
+    <!-- IMAGEN / DIAGRAMA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🖼️</span>
+            <h2>Diagrama del Proceso</h2>
+            <span class="block-tag">Visual</span>
+        </div>
+        <div class="info-block-body">
+            <div class="diagram-wrap">
+                <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;font-family:'JetBrains Mono',monospace;">
+                    <!-- Código fuente -->
+                    <rect x="10" y="60" width="140" height="60" rx="8" fill="#1a2236" stroke="#1e2d47"/>
+                    <text x="80" y="87" text-anchor="middle" fill="#64748b" font-size="10">Código fuente</text>
+                    <text x="80" y="103" text-anchor="middle" fill="#a5d6ff" font-size="11">int x = 5 + 3;</text>
+                    <!-- Arrow -->
+                    <line x1="150" y1="90" x2="195" y2="90" stroke="#00d4ff" stroke-width="2" marker-end="url(#arr)"/>
+                    <!-- Lexer box -->
+                    <rect x="196" y="50" width="120" height="80" rx="8" fill="#111827" stroke="#00d4ff" stroke-width="1.5"/>
+                    <text x="256" y="82" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="700">LEXER</text>
+                    <text x="256" y="100" text-anchor="middle" fill="#64748b" font-size="9">Expresiones</text>
+                    <text x="256" y="114" text-anchor="middle" fill="#64748b" font-size="9">regulares + AFD</text>
+                    <!-- Arrow -->
+                    <line x1="316" y1="90" x2="360" y2="90" stroke="#00d4ff" stroke-width="2" marker-end="url(#arr)"/>
+                    <!-- Tokens -->
+                    <rect x="361" y="30" width="320" height="120" rx="8" fill="#1a2236" stroke="#1e2d47"/>
+                    <text x="521" y="52" text-anchor="middle" fill="#64748b" font-size="10">Secuencia de Tokens</text>
+                    <text x="400" y="75" fill="#ff79c6" font-size="10">KW:</text><text x="422" y="75" fill="#f1fa8c" font-size="10">int</text>
+                    <text x="460" y="75" fill="#ff79c6" font-size="10">ID:</text><text x="482" y="75" fill="#f1fa8c" font-size="10">x</text>
+                    <text x="510" y="75" fill="#ff79c6" font-size="10">OP:</text><text x="534" y="75" fill="#f1fa8c" font-size="10">=</text>
+                    <text x="400" y="100" fill="#ff79c6" font-size="10">NUM:</text><text x="428" y="100" fill="#f1fa8c" font-size="10">5</text>
+                    <text x="460" y="100" fill="#ff79c6" font-size="10">OP:</text><text x="484" y="100" fill="#f1fa8c" font-size="10">+</text>
+                    <text x="510" y="100" fill="#ff79c6" font-size="10">NUM:</text><text x="538" y="100" fill="#f1fa8c" font-size="10">3</text>
+                    <text x="400" y="125" fill="#ff79c6" font-size="10">DELIM:</text><text x="448" y="125" fill="#f1fa8c" font-size="10">;</text>
+                    <defs>
+                        <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                            <path d="M0,0 L6,3 L0,6 Z" fill="#00d4ff"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.75rem;">El lexer transforma el flujo de caracteres en tokens estructurados listos para el análisis sintáctico.</p>
+        </div>
+    </div>
+
+    <!-- EJEMPLO -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">💡</span>
+            <h2>Ejemplo Práctico</h2>
+            <span class="block-tag">Código</span>
+        </div>
+        <div class="info-block-body">
+            <p><strong>Entrada:</strong> el siguiente fragmento de código C:</p>
+            <div class="code-block"><span class="kw">if</span> (x &gt; 10) {
+    resultado = x * 2;
+}</div>
+            <p><strong>Tokens generados:</strong></p>
+            <div class="code-block"><span class="cm">// Tipo           Valor</span>
+<span class="kw">KEYWORD</span>          <span class="str">"if"</span>
+<span class="kw">LPAREN</span>           <span class="str">"("</span>
+<span class="kw">IDENTIFIER</span>       <span class="str">"x"</span>
+<span class="kw">OPERATOR</span>         <span class="str">">"</span>
+<span class="kw">INTEGER</span>          <span class="num">10</span>
+<span class="kw">RPAREN</span>           <span class="str">")"</span>
+<span class="kw">LBRACE</span>           <span class="str">"{"</span>
+<span class="kw">IDENTIFIER</span>       <span class="str">"resultado"</span>
+<span class="kw">OPERATOR</span>         <span class="str">"="</span>
+<span class="kw">IDENTIFIER</span>       <span class="str">"x"</span>
+<span class="kw">OPERATOR</span>         <span class="str">"*"</span>
+<span class="kw">INTEGER</span>          <span class="num">2</span>
+<span class="kw">SEMICOLON</span>        <span class="str">";"</span>
+<span class="kw">RBRACE</span>           <span class="str">"}"</span></div>
+            <p>Los espacios en blanco y saltos de línea son ignorados. Cada elemento queda clasificado con su tipo y valor exacto.</p>
+        </div>
+    </div>
+
+    <!-- ERRORES -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">⚠️</span>
+            <h2>Errores Léxicos Comunes</h2>
+            <span class="block-tag">Errores</span>
+        </div>
+        <div class="info-block-body">
+            <table class="error-table">
+                <tr>
+                    <th>Error</th>
+                    <th>Descripción</th>
+                    <th>Ejemplo</th>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">carácter inválido</span></td>
+                    <td>Símbolo que no pertenece al alfabeto del lenguaje</td>
+                    <td><code>int x = 5</code> — el <code></code> no es válido</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">literal sin cerrar</span></td>
+                    <td>Cadena de texto que no tiene comilla de cierre</td>
+                    <td><code>print("hola);</code> — falta la <code>"</code> final</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">número malformado</span></td>
+                    <td>Literal numérico con formato incorrecto</td>
+                    <td><code>3.14.15</code> — dos puntos decimales</td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">comentario sin cerrar</span></td>
+                    <td>Comentario de bloque que no termina</td>
+                    <td><code>/* esto no termina nunca</code></td>
+                </tr>
+                <tr>
+                    <td><span class="badge-error">secuencia de escape inválida</span></td>
+                    <td>Secuencia de escape no reconocida dentro de un string</td>
+                    <td><code>"\q"</code> — <code>\q</code> no es una secuencia válida</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- IMPORTANCIA -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">🎯</span>
+            <h2>Importancia</h2>
+            <span class="block-tag">Relevancia</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>El análisis léxico es la <strong>puerta de entrada</strong> al proceso de compilación. Sin él, el compilador trabajaría directamente con millones de caracteres individuales, haciendo el proceso extremadamente complejo e ineficiente.</p>
+            </div>
+            <ul>
+                <li><strong>Simplifica las fases posteriores:</strong> el parser recibe tokens bien definidos en lugar de caracteres crudos.</li>
+                <li><strong>Eficiencia:</strong> reduce drásticamente el volumen de datos que deben procesar las siguientes fases.</li>
+                <li><strong>Detección temprana de errores:</strong> identifica caracteres y secuencias inválidas antes de continuar.</li>
+                <li><strong>Portabilidad:</strong> separar el léxico del sintáctico facilita adaptar el compilador a diferentes codificaciones o variantes del lenguaje.</li>
+                <li><strong>Facilita herramientas:</strong> IDE, resaltadores de sintaxis y linters se basan en análisis léxico.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- CONCLUSIÓN -->
+    <div class="info-block">
+        <div class="info-block-header">
+            <span class="block-icon">✅</span>
+            <h2>Conclusión</h2>
+            <span class="block-tag">Resumen</span>
+        </div>
+        <div class="info-block-body">
+            <div class="highlight-box">
+                <p>El análisis léxico es la base estructural del compilador. Transforma texto sin estructura en unidades semánticas discretas y tipadas. Su diseño mediante expresiones regulares y autómatas finitos permite reconocer eficientemente cualquier lenguaje formal con léxico regular.</p>
+                <p>Una implementación correcta del lexer garantiza que las fases de análisis sintáctico y semántico reciban datos limpios, correctamente clasificados y sin ambigüedades, sentando las bases para una compilación exitosa.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="phase-footer-nav">
+    <a href="/" class="nav-link-btn">← Inicio</a>
+    <a href="/Fase2" class="nav-link-btn">Fase 2: Análisis Sintáctico →</a>
+</div>
