@@ -1,15 +1,25 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY Compiladores/Compiladores.csproj ./Compiladores/
-RUN dotnet restore ./Compiladores/Compiladores.csproj
+# Copiar el archivo del proyecto
+COPY webSistemas.csproj ./
 
-COPY Compiladores/ ./Compiladores/
-RUN dotnet publish ./Compiladores/Compiladores.csproj -c Release -o /app/publish
+# Restaurar dependencias
+RUN dotnet restore
 
+# Copiar el resto del código
+COPY . .
+
+# Publicar aplicación
+RUN dotnet publish webSistemas.csproj -c Release -o /app/publish
+
+# Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
+
 COPY --from=build /app/publish .
+
 EXPOSE 8080
+
 ENV ASPNETCORE_URLS=http://+:8080
-ENTRYPOINT ["dotnet", "Compiladores.dll"]
+ENTRYPOINT ["dotnet", "webSistemas.dll"]
